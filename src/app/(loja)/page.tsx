@@ -18,6 +18,38 @@ async function Announcement() {
   if (!banner) return null;
   const link = banner.linkUrl ?? "";
   const external = link.startsWith("https://");
+  const ctaClass =
+    "inline-block rounded-full bg-marinho px-5 py-2.5 text-sm font-bold text-papel shadow-suave transition-colors hover:bg-marinho-texto";
+
+  // Com imagem: faixa grande com a foto ao fundo e um véu claro à esquerda para o texto ficar legível.
+  if (banner.imageUrl) {
+    return (
+      <section aria-label={banner.title} className="relative mb-8 overflow-hidden rounded-lg bg-bebe-soft">
+        {/* Imagem vinda do armazenamento externo (Vercel Blob ou link https cadastrado no painel). */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={banner.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/70 to-white/0" aria-hidden="true" />
+        <div className="relative flex min-h-52 max-w-xl flex-col justify-center gap-2 p-6 sm:min-h-64 sm:p-10">
+          <h2 className="font-display text-2xl font-semibold leading-tight tracking-tight text-marinho sm:text-4xl">{banner.title}</h2>
+          {banner.subtitle && <p className="text-marinho-texto sm:text-lg">{banner.subtitle}</p>}
+          {link && (
+            <div className="pt-2">
+              {external ? (
+                <a href={link} target="_blank" rel="noopener noreferrer" className={ctaClass}>
+                  Saiba mais
+                </a>
+              ) : (
+                <Link href={link} className={ctaClass}>
+                  Ver agora
+                </Link>
+              )}
+            </div>
+          )}
+        </div>
+      </section>
+    );
+  }
+
   return (
     <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-md bg-lilas-soft px-5 py-3">
       <div>
