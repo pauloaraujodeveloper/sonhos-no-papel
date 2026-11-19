@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+/*
+ * Tokens de design — Sonhos no Papel.
+ * Cores extraídas da logo: azul-bebê (nuvem), lilás (nuvem de trás),
+ * rosa (clipe e lápis), pêssego (ponta do lápis) e azul-marinho (texto).
+ * Os valores ficam aqui até a paleta ser configurável pelo painel administrativo.
+ */
+@theme {
+  --color-bebe: #bde3f6;
+  --color-bebe-soft: #e8f5fc;
+  --color-lilas: #d3c3f1;
+  --color-lilas-soft: #f1ecfb;
+  --color-rosa: #ee95b8;
+  --color-rosa-soft: #f8dbe7;
+  --color-sol: #fbe7a1;
+  --color-pessego: #f9d8c0;
+  --color-marinho: #2e2459;
+  --color-marinho-texto: #54438e;
+  --color-papel: #fdfcff;
+  --color-borda: #e4dff0;
+  --color-muted: #6b6785;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.5rem;
+
+  --shadow-suave: 0 1px 2px rgb(46 36 89 / 0.06), 0 8px 24px -12px rgb(46 36 89 / 0.18);
+
+  --font-sans: var(--font-corpo), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-titulo), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--color-papel);
+    color: var(--color-marinho-texto);
+    font-family: var(--font-sans);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-rosa);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

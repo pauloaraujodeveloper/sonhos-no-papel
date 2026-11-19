@@ -1,0 +1,408 @@
+// Esquema do banco de dados — Sonhos no Papel (PRD v1.2, seção 9)
+// PostgreSQL hospedado no Neon. Valores monetários são inteiros em centavos.
+// Pedidos são encaminhados pelo WhatsApp; o pagamento é conferido manualmente.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+/// OWNER: proprietária, acesso ao negócio. DEVELOPER: manutenção técnica da loja
+/// (integrações, configurações avançadas, auditoria). EDITOR: operação do dia a dia.
+enum AdminRole {
+  OWNER
+  DEVELOPER
+  EDITOR
+}
+
+enum PixKeyType {
+  CPF_CNPJ
+  EMAIL
+  PHONE
+  RANDOM
+}
+
+enum FulfillmentType {
+  PICKUP
+  DELIVERY
+}
+
+/// Status comercial do pedido (PRD seção 8).
+enum OrderStatus {
+  NEW
+  AWAITING_CONFIRMATION
+  CONFIRMED
+  IN_PREPARATION
+  READY_FOR_PICKUP
+  OUT_FOR_DELIVERY
+  COMPLETED
+  CANCELLED
+}
+
+/// Status financeiro, independente do status comercial (PRD seção 8).
+enum PaymentStatus {
+  NOT_INFORMED
+  AWAITING_PAYMENT
+  UNDER_REVIEW
+  PAID
+  CANCELLED
+  REFUNDED
+}
+
+/// Status de recebimento (PRD seção 8).
+enum FulfillmentStatus {
+  PICKUP_PENDING
+  DELIVERY_PENDING
+  OUT_FOR_DELIVERY
+  DELIVERED
+  PICKED_UP
+}
+
+enum InventoryMovementType {
+  ENTRY
+  EXIT
+  ADJUSTMENT
+  ORDER_RESERVED
+  ORDER_RELEASED
+  ORDER_CONFIRMED
+}
+
+enum ReservationStatus {
+  ACTIVE
+  RELEASED
+  CONSUMED
+}
+
+enum ActorType {
+  ADMIN
+  SYSTEM
+  CUSTOMER
+}
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String
+  passwordHash String
+  role         AdminRole @default(EDITOR)
+  active       Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  inventoryMovements InventoryMovement[]
+  orderStatusChanges OrderStatusHistory[]
+  paymentChanges     PaymentStatusHistory[]
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  imageUrl    String?
+  iconName    String?
+  active      Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products Product[]
+
+  @@index([active, sortOrder])
+}
+
+model Product {
+  id                    String    @id @default(cuid())
+  name                  String
+  slug                  String    @unique
+  description           String?
+  sku                   String?   @unique
+  priceCents            Int
+  promotionalPriceCents Int?
+  stockQuantity         Int       @default(0)
+  lowStockThreshold     Int       @default(3)
+  active                Boolean   @default(true)
+  featured              Boolean   @default(false)
+  isNew                 Boolean   @default(false)
+  categoryId            String
+  deletedAt             DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  category           Category               @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  images             ProductImage[]
+  variants           ProductVariant[]
+  inventoryMovements InventoryMovement[]
+  reservations       InventoryReservation[]
+  orderItems         OrderItem[]
+
+  @@index([categoryId, active])
+  @@index([active, featured])
+  @@index([deletedAt])
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  url       String
+  alt       String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId, sortOrder])
+}
+
+model ProductVariant {
+  id              String   @id @default(cuid())
+  productId       String
+  name            String
+  sku             String?  @unique
+  priceDeltaCents Int      @default(0)
+  stockQuantity   Int      @default(0)
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  product            Product                @relation(fields: [productId], references: [id], onDelete: Cascade)
+  inventoryMovements InventoryMovement[]
+  reservations       InventoryReservation[]
+  orderItems         OrderItem[]
+
+  @@index([productId, active])
+}
+
+model InventoryMovement {
+  id           String                @id @default(cuid())
+  productId    String
+  variantId    String?
+  type         InventoryMovementType
+  quantity     Int
+  balanceAfter Int
+  reason       String?
+  orderId      String?
+  adminUserId  String?
+  createdAt    DateTime              @default(now())
+
+  product Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  order   Order?          @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  admin   AdminUser?      @relation(fields: [adminUserId], references: [id], onDelete: SetNull)
+
+  @@index([productId, createdAt])
+  @@index([orderId])
+}
+
+/// Reserva temporária de estoque enquanto o pedido aguarda confirmação (RF-013).
+model InventoryReservation {
+  id         String            @id @default(cuid())
+  orderId    String
+  productId  String
+  variantId  String?
+  quantity   Int
+  status     ReservationStatus @default(ACTIVE)
+  expiresAt  DateTime?
+  createdAt  DateTime          @default(now())
+  releasedAt DateTime?
+
+  order   Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([status, expiresAt])
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders Order[]
+}
+
+/// Zonas de entrega com taxa própria (RF-010). Bairro/região é texto livre cadastrado pelo administrador.
+model DeliveryZone {
+  id             String   @id @default(cuid())
+  name           String
+  feeCents       Int
+  freeAboveCents Int?
+  active         Boolean  @default(true)
+  sortOrder      Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([active, sortOrder])
+}
+
+model Order {
+  id                 String            @id @default(cuid())
+  /// Número legível exibido ao cliente, ex.: SP-0001.
+  orderNumber        Int               @unique @default(autoincrement())
+  customerId         String?
+  customerName       String
+  customerPhone      String
+  fulfillmentType    FulfillmentType
+  deliveryZoneName   String?
+  deliveryCep        String?
+  deliveryStreet     String?
+  deliveryNumber     String?
+  deliveryDistrict   String?
+  deliveryCity       String?
+  deliveryComplement String?
+  deliveryReference  String?
+  notes              String?
+  subtotalCents      Int
+  discountCents      Int               @default(0)
+  deliveryFeeCents   Int               @default(0)
+  totalCents         Int
+  status             OrderStatus       @default(NEW)
+  paymentStatus      PaymentStatus     @default(NOT_INFORMED)
+  fulfillmentStatus  FulfillmentStatus
+  /// Momento em que o cliente foi encaminhado ao WhatsApp (o envio não é garantido).
+  whatsappOpenedAt   DateTime?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  customer           Customer?              @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  items              OrderItem[]
+  reservations       InventoryReservation[]
+  inventoryMovements InventoryMovement[]
+  statusHistory      OrderStatusHistory[]
+  paymentHistory     PaymentStatusHistory[]
+  payments           Payment[]
+
+  @@index([createdAt])
+  @@index([status, paymentStatus])
+  @@index([customerId])
+  @@index([customerPhone])
+}
+
+model OrderItem {
+  id                 String   @id @default(cuid())
+  orderId            String
+  productId          String
+  variantId          String?
+  productName        String
+  variantName        String?
+  unitPriceCents     Int
+  listUnitPriceCents Int
+  quantity           Int
+  lineTotalCents     Int
+  createdAt          DateTime @default(now())
+
+  order   Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product         @relation(fields: [productId], references: [id], onDelete: Restrict)
+  variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+/// Registro financeiro manual do pedido (RF-008). Não há cobrança automática no MVP.
+model Payment {
+  id          String        @id @default(cuid())
+  orderId     String
+  method      String        @default("PIX_MANUAL")
+  amountCents Int
+  status      PaymentStatus @default(AWAITING_PAYMENT)
+  paidAt      DateTime?
+  note        String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([status])
+}
+
+model OrderStatusHistory {
+  id          String       @id @default(cuid())
+  orderId     String
+  fromStatus  OrderStatus?
+  toStatus    OrderStatus
+  actorType   ActorType
+  adminUserId String?
+  note        String?
+  createdAt   DateTime     @default(now())
+
+  order Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  admin AdminUser? @relation(fields: [adminUserId], references: [id], onDelete: SetNull)
+
+  @@index([orderId, createdAt])
+}
+
+model PaymentStatusHistory {
+  id          String         @id @default(cuid())
+  orderId     String
+  fromStatus  PaymentStatus?
+  toStatus    PaymentStatus
+  actorType   ActorType
+  adminUserId String?
+  note        String?
+  createdAt   DateTime       @default(now())
+
+  order Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  admin AdminUser? @relation(fields: [adminUserId], references: [id], onDelete: SetNull)
+
+  @@index([orderId, createdAt])
+}
+
+model StoreSettings {
+  id                     String      @id @default("default")
+  storeName              String      @default("Sonhos no Papel")
+  logoUrl                String?
+  faviconUrl             String?
+  whatsappNumber         String?
+  email                  String?
+  phone                  String?
+  address                String?
+  openingHours           String?
+  pickupInstructions     String?
+  socialLinks            Json?
+  deliveryFlatFeeCents   Int         @default(0)
+  deliveryFreeAboveCents Int?
+  autoMessage            String?
+  pixKey                 String?
+  pixKeyType             PixKeyType?
+  pixReceiverName        String?
+  pixBankName            String?
+  pixCity                String?
+  pixReferenceQrUrl      String?
+  theme                  Json?
+  updatedAt              DateTime    @updatedAt
+}
+
+model Banner {
+  id        String   @id @default(cuid())
+  title     String
+  subtitle  String?
+  imageUrl  String?
+  linkUrl   String?
+  active    Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([active, sortOrder])
+}
+
+model SiteSection {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  title     String?
+  body      String?
+  active    Boolean  @default(true)
+  sortOrder Int      @default(0)
+  updatedAt DateTime @updatedAt
+}
