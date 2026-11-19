@@ -1,3 +1,4 @@
+import { RiArrowRightLine } from "@remixicon/react";
 import Image from "next/image";
 import Link from "next/link";
 import { formatBRL } from "@/lib/commerce/pricing";
@@ -31,7 +32,7 @@ export function StockBadge({ status, promo, isNew }: { status: ProductSummary["s
 export function ProductCard({ product, featured = false }: { product: ProductSummary; featured?: boolean }) {
   const out = product.stockStatus === "OUT_OF_STOCK";
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-md border border-borda bg-white shadow-suave transition duration-300 hover:-translate-y-1 hover:shadow-lg">
+    <article className="group flex h-full flex-col overflow-hidden rounded-md border border-borda bg-white shadow-suave transition duration-300 ease-out hover:-translate-y-1 hover:shadow-lg">
       <Link href={`/produto/${product.slug}`} className="flex flex-1 flex-col">
         <div className={`relative overflow-hidden ${featured ? "min-h-64 flex-1" : "aspect-square"}`}>
           <ProductImage
@@ -52,7 +53,11 @@ export function ProductCard({ product, featured = false }: { product: ProductSum
               <span className="text-sm text-muted line-through">{formatBRL(product.priceCents)}</span>
             )}
           </p>
-          {featured && <span className="pt-1 text-sm font-bold text-accent-600 group-hover:underline">Ver produto →</span>}
+          {/* No computador, aparece ao passar o mouse ou focar; no celular fica sempre visível. */}
+          <span className="inline-flex items-center gap-1 pt-1 text-sm font-bold text-accent-600 transition-opacity duration-300 ease-out sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
+            Ver produto
+            <RiArrowRightLine aria-hidden="true" className="h-4 w-4 transition-transform duration-300 ease-out group-hover:translate-x-0.5" />
+          </span>
         </div>
       </Link>
     </article>
