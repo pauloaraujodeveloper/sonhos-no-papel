@@ -13,9 +13,20 @@ async function checkDatabase(): Promise<CheckResult> {
   const started = performance.now();
   try {
     const rows = await db.$queryRaw<{ ok: number }[]>`SELECT 1 AS ok`;
-    return { ok: rows[0]?.ok === 1, latencyMs: Math.round(performance.now() - started) };
+    if (rows[0]?.ok !== 1) throw new Error("sem resposta");
   } catch {
     return { ok: false, latencyMs: Math.round(performance.now() - started), detail: "falha na conexão" };
+  }
+  try {
+    // Confirma que as tabelas existem: conexão ok com o banco errado ou sem migração dá páginas quebradas.
+    await db.category.count();
+    return { ok: true, latencyMs: Math.round(performance.now() - started) };
+  } catch {
+    return {
+      ok: false,
+      latencyMs: Math.round(performance.now() - started),
+      detail: "conectou, mas o esquema não está migrado (rode npm run db:deploy neste banco)",
+    };
   }
 }
 
@@ -23,7 +34,8 @@ async function checkNeonAuth(): Promise<CheckResult> {
   const started = performance.now();
   const url = process.env.NEON_AUTH_JWKS_URL;
   if (!url) {
-    return { ok: false, latencyMs: 0, detail: "NEON_AUTH_JWKS_URL não configurada" };
+    // O login do painel usa o banco próprio; o Neon Auth é opcional e hoje não é usado pelo app.
+    return { ok: true, latencyMs: 0, detail: "não configurado (opcional)" };
   }
   try {
     const response = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(8000) });
