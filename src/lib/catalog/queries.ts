@@ -54,7 +54,8 @@ async function loadReserved(productIds: string[]): Promise<Map<string, number>> 
   if (productIds.length === 0) return new Map();
   const rows = await db.inventoryReservation.groupBy({
     by: ["productId", "variantId"],
-    where: { productId: { in: productIds }, status: "ACTIVE" },
+    // Reservas vencidas deixam de segurar estoque (sem precisar de rotina agendada).
+    where: { productId: { in: productIds }, status: "ACTIVE", OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }] },
     _sum: { quantity: true },
   });
   return new Map(rows.map((r) => [`${r.productId}::${r.variantId ?? ""}`, r._sum.quantity ?? 0]));

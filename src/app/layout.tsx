@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Nunito, Quicksand } from "next/font/google";
-import "./globals.css";
+import "@/styles/globals.css";
+import { BRAND } from "@/lib/brand";
 
 const corpo = Nunito({
   variable: "--font-corpo",
@@ -15,14 +16,13 @@ const titulo = Quicksand({
   display: "swap",
 });
 
-const siteName = "Sonhos no Papel";
-const siteDescription =
-  "Papelaria com canetas, lápis, agendas, cadernos e pincéis escolhidos com carinho.";
+const siteName = BRAND.name;
+const siteDescription = BRAND.description;
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: {
-    default: siteName,
+    default: `${siteName} | ${BRAND.slogan}`,
     template: `%s | ${siteName}`,
   },
   description: siteDescription,
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "pt_BR",
     siteName,
-    title: siteName,
+    title: `${siteName} | ${BRAND.slogan}`,
     description: siteDescription,
     images: ["/brand/simbolo.png"],
   },

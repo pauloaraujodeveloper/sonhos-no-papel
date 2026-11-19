@@ -64,8 +64,9 @@ export interface CreatedOrder {
 }
 
 /**
- * Carrega o catálogo com o estoque livre: estoque físico menos reservas ativas.
- * Reservas expiradas ainda não são liberadas automaticamente (job pendente).
+ * Carrega o catálogo com o estoque livre: estoque físico menos reservas ativas e não vencidas.
+ * Uma reserva vencida deixa de segurar estoque; se o pedido for confirmado depois, a baixa só
+ * acontece se ainda houver saldo (atualização guardada em service.ts).
  */
 export async function loadCatalog(
   tx: Prisma.TransactionClient,
@@ -78,7 +79,7 @@ export async function loadCatalog(
 
   const reservations = await tx.inventoryReservation.groupBy({
     by: ["productId", "variantId"],
-    where: { productId: { in: productIds }, status: "ACTIVE" },
+    where: { productId: { in: productIds }, status: "ACTIVE", OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }] },
     _sum: { quantity: true },
   });
   const reservedByKey = new Map<string, number>();

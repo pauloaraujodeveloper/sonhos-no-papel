@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { listCategories, listProducts, type SortKey } from "@/lib/catalog/queries";
+import { FilterPanel } from "./FilterPanel";
 import { ProductGrid } from "./ProductCard";
 
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -69,7 +70,8 @@ export async function Listing({
 
   return (
     <div className="grid gap-6 lg:grid-cols-[16rem_1fr]">
-      <form action={basePath} method="get" className="space-y-4 rounded-md border border-borda bg-white p-4 shadow-suave lg:self-start">
+      <FilterPanel active={hasFilters}>
+      <form action={basePath} method="get" className="space-y-4 rounded-md border border-borda bg-white p-4 shadow-suave">
         <div>
           <label htmlFor="f-q" className="mb-1 block text-xs font-bold uppercase tracking-wide text-muted">
             Buscar
@@ -128,6 +130,7 @@ export async function Listing({
           )}
         </div>
       </form>
+      </FilterPanel>
 
       <div>
         <p className="mb-3 text-sm text-muted" aria-live="polite">
@@ -138,7 +141,7 @@ export async function Listing({
           <div className="rounded-md border border-dashed border-borda bg-white p-10 text-center">
             <p className="font-display text-lg font-semibold text-marinho">Nada por aqui ainda</p>
             <p className="mt-1 text-sm text-muted">
-              {hasFilters ? "Tente outros termos ou limpe os filtros." : "Os produtos serão cadastrados em breve."}
+              {hasFilters ? "Tente outros termos ou limpe os filtros." : "Estamos preparando o catálogo. Volte em breve."}
             </p>
           </div>
         ) : (

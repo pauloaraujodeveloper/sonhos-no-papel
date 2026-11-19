@@ -1,5 +1,4 @@
-@import "tailwindcss";
-
+/* Identidade Sonhos no Papel: tokens de cor, raios, sombras e fontes (carregado pelo BoardUI em styles/globals.css). */
 /*
  * Tokens de design — Sonhos no Papel.
  * Cores extraídas da logo: azul-bebê (nuvem), lilás (nuvem de trás),
@@ -52,5 +51,36 @@
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+}
+
+/* Cor de destaque do BoardUI (botões, foco, seleção) na paleta da marca: lilás/marinho da logo. */
+@theme {
+  --color-accent-50: #f6f3fc;
+  --color-accent-100: #ece6f8;
+  --color-accent-200: #d3c3f1;
+  --color-accent-300: #b8a2e4;
+  --color-accent-400: #937ccc;
+  --color-accent-500: #725cb0;
+  --color-accent-600: #54438e;
+  --color-accent-700: #43367a;
+  --color-accent-800: #342a60;
+  --color-accent-900: #2e2459;
+  --color-accent-950: #1d1740;
+}
+/* Entrada animada (RevealGroup): filhos come�am invis�veis e o animejs os revela ao aparecerem na tela. */
+@keyframes reveal-fallback {
+  to {
+    opacity: 1;
+  }
+}
+/* Garantia: se o JavaScript demorar, o conteúdo aparece sozinho depois de 1,4 s. */
+.reveal > * {
+  opacity: 0;
+  animation: reveal-fallback 0.01s 1.4s forwards;
+}
+@media (scripting: none), (prefers-reduced-motion: reduce) {
+  .reveal > * {
+    opacity: 1;
   }
 }

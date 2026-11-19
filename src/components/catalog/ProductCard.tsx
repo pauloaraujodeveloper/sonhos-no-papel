@@ -28,26 +28,31 @@ export function StockBadge({ status, promo, isNew }: { status: ProductSummary["s
   );
 }
 
-export function ProductCard({ product }: { product: ProductSummary }) {
+export function ProductCard({ product, featured = false }: { product: ProductSummary; featured?: boolean }) {
   const out = product.stockStatus === "OUT_OF_STOCK";
   return (
-    <article className="group flex flex-col overflow-hidden rounded-md border border-borda bg-white shadow-suave transition-transform duration-200 hover:-translate-y-0.5">
+    <article className="group flex h-full flex-col overflow-hidden rounded-md border border-borda bg-white shadow-suave transition duration-300 hover:-translate-y-1 hover:shadow-lg">
       <Link href={`/produto/${product.slug}`} className="flex flex-1 flex-col">
-        <div className="relative aspect-square overflow-hidden">
-          <ProductImage url={product.imageUrl} alt={product.name} className={`h-full w-full ${out ? "opacity-60" : ""}`} />
+        <div className={`relative overflow-hidden ${featured ? "min-h-64 flex-1" : "aspect-square"}`}>
+          <ProductImage
+            url={product.imageUrl}
+            alt={product.name}
+            className={`h-full w-full transition-transform duration-500 group-hover:scale-105 ${featured ? "absolute inset-0" : ""} ${out ? "opacity-60" : ""}`}
+          />
           <div className="absolute left-2 top-2">
             <StockBadge status={product.stockStatus} promo={product.promotionalPriceCents !== null} isNew={product.isNew} />
           </div>
         </div>
-        <div className="flex flex-1 flex-col gap-1 p-3">
+        <div className={`flex flex-col gap-1 ${featured ? "p-5" : "flex-1 p-3"}`}>
           <p className="text-xs font-semibold uppercase tracking-wide text-muted">{product.categoryName}</p>
-          <h3 className="font-display text-base font-semibold leading-snug text-marinho">{product.name}</h3>
+          <h3 className={`font-display font-semibold leading-snug text-marinho ${featured ? "text-2xl" : "text-base"}`}>{product.name}</h3>
           <p className="mt-auto flex items-baseline gap-2 pt-2">
-            <span className="text-lg font-bold text-marinho">{formatBRL(product.effectivePriceCents)}</span>
+            <span className={`font-bold text-marinho ${featured ? "text-2xl" : "text-lg"}`}>{formatBRL(product.effectivePriceCents)}</span>
             {product.promotionalPriceCents !== null && (
               <span className="text-sm text-muted line-through">{formatBRL(product.priceCents)}</span>
             )}
           </p>
+          {featured && <span className="pt-1 text-sm font-bold text-accent-600 group-hover:underline">Ver produto →</span>}
         </div>
       </Link>
     </article>

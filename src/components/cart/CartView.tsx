@@ -14,9 +14,9 @@ export function CartView() {
     return (
       <div className="rounded-md border border-dashed border-borda bg-white p-10 text-center">
         <p className="font-display text-xl font-semibold text-marinho">Seu carrinho está vazio</p>
-        <p className="mt-1 text-sm text-muted">Escolha alguns produtos para começar.</p>
+        <p className="mt-1 text-sm text-muted">Que tal começar pelo catálogo?</p>
         <Link href="/produtos" className="mt-5 inline-block rounded-full bg-marinho px-6 py-3 text-sm font-bold text-papel hover:bg-marinho-texto">
-          Ver produtos
+          Ver catálogo
         </Link>
       </div>
     );
@@ -142,7 +142,7 @@ export function CartView() {
             <dd className="font-bold text-marinho">{formatBRL(data.totalCents)}</dd>
           </div>
         </dl>
-        <p className="text-xs text-muted">Entrega ou retirada você escolhe na próxima etapa.</p>
+        <p className="text-xs text-muted">Entrega ou retirada você escolhe na próxima etapa. O pedido segue pelo WhatsApp.</p>
         {canCheckout ? (
           <Link href="/checkout" className="block rounded-full bg-marinho px-6 py-3 text-center text-sm font-bold text-papel shadow-suave hover:bg-marinho-texto">
             Finalizar pedido

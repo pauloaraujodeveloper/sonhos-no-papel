@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { cartActions, useCartLines } from "@/lib/cart/store";
 import { usePricedCart } from "@/lib/cart/use-priced-cart";
+import { BRAND } from "@/lib/brand";
 import { formatBRL } from "@/lib/commerce/pricing";
 
 type Fulfillment = "PICKUP" | "DELIVERY";
@@ -35,8 +36,8 @@ export function CheckoutView() {
         <p className="text-sm font-bold uppercase tracking-widest text-muted">Pedido registrado</p>
         <h2 className="font-display text-3xl font-semibold text-marinho">{created.orderCode}</h2>
         <p className="text-muted">
-          Total {formatBRL(created.totalCents)}. Envie a mensagem no WhatsApp para a proprietária confirmar a disponibilidade e
-          combinar o pagamento via Pix. Seu pedido só é confirmado após essa conversa.
+          Total {formatBRL(created.totalCents)}. Falta só um passo: envie a mensagem no WhatsApp. Por lá você confirma a
+          disponibilidade e recebe a chave ou o QR Code Pix. O pedido só é confirmado depois dessa conversa.
         </p>
         <a
           href={created.whatsappUrl}
@@ -316,7 +317,7 @@ export function CheckoutView() {
         >
           {submitting ? "Enviando…" : "Finalizar pedido pelo WhatsApp"}
         </button>
-        <p className="text-xs text-muted">Nenhum pagamento é feito no site. O Pix é combinado pelo WhatsApp.</p>
+        <p className="text-xs text-muted">{BRAND.payment}</p>
         <Link href="/carrinho" className="block text-center text-sm font-semibold text-marinho-texto hover:underline">
           Voltar ao carrinho
         </Link>
