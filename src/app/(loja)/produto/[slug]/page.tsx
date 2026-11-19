@@ -2,7 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { AddToCart } from "@/components/catalog/AddToCart";
-import { ProductGrid, ProductImage, StockBadge } from "@/components/catalog/ProductCard";
+import { AskWhatsApp } from "@/components/catalog/AskWhatsApp";
+import { Gallery } from "@/components/catalog/Gallery";
+import { ProductGrid, StockBadge } from "@/components/catalog/ProductCard";
 import { getProductBySlug } from "@/lib/catalog/queries";
 import { formatBRL } from "@/lib/commerce/pricing";
 
@@ -16,8 +18,6 @@ async function ProductContent({ params }: { params: Promise<{ slug: string }> })
   const { slug } = await params;
   const product = await getProductBySlug(slug);
   if (!product) notFound();
-
-  const [mainImage, ...otherImages] = product.images;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -48,20 +48,7 @@ async function ProductContent({ params }: { params: Promise<{ slug: string }> })
       </nav>
 
       <div className="grid gap-8 md:grid-cols-2">
-        <div className="space-y-3">
-          <div className="overflow-hidden rounded-md border border-borda bg-white">
-            <ProductImage url={mainImage?.url ?? null} alt={mainImage?.alt ?? product.name} className="aspect-square h-full w-full" />
-          </div>
-          {otherImages.length > 0 && (
-            <ul className="grid grid-cols-4 gap-2">
-              {otherImages.map((img) => (
-                <li key={img.url} className="overflow-hidden rounded-sm border border-borda">
-                  <ProductImage url={img.url} alt={img.alt ?? product.name} className="aspect-square h-full w-full" />
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        <Gallery images={product.images} name={product.name} />
 
         <div className="space-y-5">
           <StockBadge status={product.stockStatus} promo={product.promotionalPriceCents !== null} isNew={product.isNew} />
@@ -77,6 +64,9 @@ async function ProductContent({ params }: { params: Promise<{ slug: string }> })
           {product.description && <p className="leading-relaxed text-muted">{product.description}</p>}
 
           <AddToCart productId={product.id} variants={product.variants} availableQuantity={product.availableQuantity} />
+          <Suspense fallback={null}>
+            <AskWhatsApp productName={product.name} />
+          </Suspense>
         </div>
       </div>
 

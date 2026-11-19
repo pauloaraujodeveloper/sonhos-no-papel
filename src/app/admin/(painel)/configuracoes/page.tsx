@@ -54,8 +54,9 @@ async function Settings({ searchParams }: { searchParams: SP }) {
             <input id="openingHours" name="openingHours" defaultValue={s?.openingHours ?? ""} className={inputClass} />
           </div>
           <div>
-            <label htmlFor="instagram" className={labelClass}>Instagram (link)</label>
-            <input id="instagram" name="instagram" defaultValue={social.instagram ?? ""} className={inputClass} />
+            <label htmlFor="instagram" className={labelClass}>Instagram (@usuário ou link)</label>
+            <input id="instagram" name="instagram" defaultValue={social.instagram ?? ""} placeholder="@sonhosnopapel" className={inputClass} />
+            <p className="mt-1 text-xs text-muted">Aparece como ícone no rodapé e na página inicial.</p>
           </div>
           <div className="sm:col-span-2">
             <label htmlFor="pickupInstructions" className={labelClass}>Orientações de retirada</label>

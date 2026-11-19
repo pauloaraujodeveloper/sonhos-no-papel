@@ -1,6 +1,8 @@
 "use server";
 
+import { Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
+import { instagramUrl } from "@/lib/social";
 import { z } from "zod";
 import { SETTINGS_ROLES, requireAdmin } from "@/lib/auth/guard";
 import { normalizeWhatsAppNumber } from "@/lib/commerce/whatsapp";
@@ -59,6 +61,8 @@ export async function saveSettingsAction(formData: FormData) {
 
   const d = parsed.data;
   if (d.pixKey && !d.pixKeyType) go("erro", "Escolha o tipo da chave Pix.");
+  const instagram = d.instagram ? instagramUrl(d.instagram) : null;
+  if (d.instagram && !instagram) go("erro", "Instagram inválido. Use @usuário ou o link do perfil (instagram.com/usuario).");
 
   const data = {
     storeName: d.storeName,
@@ -73,7 +77,7 @@ export async function saveSettingsAction(formData: FormData) {
     pixReceiverName: d.pixReceiverName || null,
     pixBankName: d.pixBankName || null,
     pixCity: d.pixCity || null,
-    socialLinks: d.instagram ? { instagram: d.instagram } : undefined,
+    socialLinks: instagram ? { instagram } : Prisma.JsonNull,
     deliveryFlatFeeCents: flatFee,
     deliveryFreeAboveCents: freeAbove,
   };

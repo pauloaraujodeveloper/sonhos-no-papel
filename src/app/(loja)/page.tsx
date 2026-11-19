@@ -6,6 +6,7 @@ import { Carousel, CarouselItem } from "@/components/base/carousel/carousel";
 import { ButtonLink } from "@/components/base/buttons/button";
 import { ProductCard, ProductGridSkeleton } from "@/components/catalog/ProductCard";
 import { RevealGroup } from "@/components/site/Reveal";
+import { SocialLinks } from "@/components/site/SocialLinks";
 import { Slogan } from "@/components/site/ThemeStyle";
 import { listCategories, listProducts, type ProductListParams } from "@/lib/catalog/queries";
 import { BRAND } from "@/lib/brand";
@@ -235,6 +236,11 @@ export default function Home() {
           <ButtonLink href="/produtos">Ver catálogo</ButtonLink>
           <Suspense fallback={null}>
             <WhatsAppCta />
+          </Suspense>
+        </div>
+        <div className="flex justify-center">
+          <Suspense fallback={null}>
+            <SocialLinks />
           </Suspense>
         </div>
       </section>
