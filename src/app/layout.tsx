@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { SITE_URL } from "@/lib/site";
 import { Nunito, Quicksand } from "next/font/google";
 import "@/styles/globals.css";
 import { BRAND } from "@/lib/brand";
@@ -20,7 +21,7 @@ const siteName = BRAND.name;
 const siteDescription = BRAND.description;
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: `${siteName} | ${BRAND.slogan}`,
     template: `%s | ${siteName}`,

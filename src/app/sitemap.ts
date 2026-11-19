@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
+import { SITE_URL } from "@/lib/site";
 import { connection } from "next/server";
 import { db } from "@/lib/db";
 
-const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const base = SITE_URL;
 
 /** Sitemap gerado do banco: home, listagem, categorias ativas e produtos ativos. */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
