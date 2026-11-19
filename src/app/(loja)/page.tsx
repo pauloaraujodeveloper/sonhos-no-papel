@@ -6,6 +6,7 @@ import { Carousel, CarouselItem } from "@/components/base/carousel/carousel";
 import { ButtonLink } from "@/components/base/buttons/button";
 import { ProductCard, ProductGridSkeleton } from "@/components/catalog/ProductCard";
 import { RevealGroup } from "@/components/site/Reveal";
+import { Slogan } from "@/components/site/ThemeStyle";
 import { listCategories, listProducts, type ProductListParams } from "@/lib/catalog/queries";
 import { BRAND } from "@/lib/brand";
 import { buildWhatsAppUrl } from "@/lib/commerce/whatsapp";
@@ -136,7 +137,11 @@ export default function Home() {
       <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-accent-600">{BRAND.name}</p>
-          <h1 className="font-display text-3xl font-semibold leading-tight tracking-tight text-marinho sm:text-5xl">{BRAND.slogan}</h1>
+          <h1 className="font-display text-3xl font-semibold leading-tight tracking-tight text-marinho sm:text-5xl">
+            <Suspense fallback={BRAND.slogan}>
+              <Slogan />
+            </Suspense>
+          </h1>
           <p className="mt-2 max-w-2xl text-muted">{BRAND.intro}</p>
         </div>
         <ButtonLink href="/produtos" trailingIcon={RiArrowRightLine}>
@@ -187,7 +192,12 @@ export default function Home() {
 
       <section className="mt-12 flex flex-col items-center gap-4 rounded-lg bg-bebe-soft px-6 py-10 text-center">
         <Image src="/brand/logo-completa.webp" alt="Sonhos no Papel" width={140} height={164} className="h-auto w-28" />
-        <p className="max-w-md font-display text-xl font-semibold text-marinho">{BRAND.slogan}.</p>
+        <p className="max-w-md font-display text-xl font-semibold text-marinho">
+          <Suspense fallback={BRAND.slogan}>
+            <Slogan />
+          </Suspense>
+          .
+        </p>
         <p className="max-w-md text-muted">Ficou com dúvida sobre algum produto? Chame a gente no WhatsApp.</p>
         <div className="flex flex-wrap justify-center gap-3">
           <ButtonLink href="/produtos">Ver catálogo</ButtonLink>

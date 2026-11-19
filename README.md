@@ -46,11 +46,11 @@ Verificações: `npm test` · `npm run typecheck` · `npm run lint` · `npm run 
 ## Rotas
 
 Loja: `/` · `/produtos` · `/categoria/[slug]` · `/produto/[slug]` · `/carrinho` · `/checkout`
-Painel: `/admin` (dashboard) · `/admin/pedidos` · `/admin/produtos` · `/admin/categorias` · `/admin/estoque` · `/admin/configuracoes`
+Painel: `/admin` (dashboard) · `/admin/pedidos` · `/admin/produtos` · `/admin/categorias` · `/admin/estoque` · `/admin/banners` · `/admin/aparencia` (cores e assinatura, valem na hora) · `/admin/configuracoes`
 
 ## Neon e deploy (Vercel)
 
-- Variáveis: `DATABASE_URL` (pooled, usada pelo app), `DATABASE_URL_UNPOOLED` (direta, usada pelas migrações), `NEON_AUTH_*`, `SESSION_SECRET` (mín. 32 caracteres) e `NEXT_PUBLIC_SITE_URL`. Cadastre-as na Vercel em Settings → Environment Variables.
+- Variáveis: `DATABASE_URL` (pooled, usada pelo app), `DATABASE_URL_UNPOOLED` (direta, usada pelas migrações), `NEON_AUTH_*`, `SESSION_SECRET` (mín. 32 caracteres), `NEXT_PUBLIC_SITE_URL` e `BLOB_READ_WRITE_TOKEN` (upload de fotos: na Vercel, Storage → Create → Blob e conecte ao projeto). Cadastre-as na Vercel em Settings → Environment Variables.
 - Banco de teste isolado: `neon checkout teste --create` (volte com `neon checkout production`).
 - Antes da primeira publicação: `npm run db:deploy` com a URL direta.
 - O WhatsApp da loja é configurado no painel (Configurações). Sem ele o checkout não finaliza pedidos.
@@ -61,7 +61,7 @@ O site não cobra Pix: a chave cadastrada em Configurações aparece só na mens
 
 ## Pendências
 
-Upload de imagens (hoje por link https) · banners e aparência · liberação automática das reservas de 48 h · limite de requisições em armazenamento compartilhado · sitemap/robots · deploy.
+Troca de logo pelo painel · limite de requisições em armazenamento compartilhado · deploy na Vercel (upload de fotos já implementado, depende do token do Blob).
 
 ## Notas
 

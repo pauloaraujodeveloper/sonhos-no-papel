@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { Flash, Loading, firstParam } from "@/components/admin/Flash";
 import { cardClass, inputClass, labelClass } from "@/components/admin/styles";
+import { ImageUploader } from "@/components/admin/ImageUploader";
 import { SubmitButton } from "@/components/admin/ui";
 import { deleteBannerAction, saveBannerAction } from "@/lib/admin/actions/banners";
 import { requireAdmin } from "@/lib/auth/guard";
@@ -25,6 +26,7 @@ function BannerFields({ b }: { b?: { id: string; title: string; subtitle: string
       <div>
         <label htmlFor={`i-${p}`} className={labelClass}>Imagem (link https)</label>
         <input id={`i-${p}`} name="imageUrl" defaultValue={b?.imageUrl ?? ""} placeholder="opcional" className={inputClass} />
+        <ImageUploader targetId={`i-${p}`} />
       </div>
       <div>
         <label htmlFor={`l-${p}`} className={labelClass}>Link do botão</label>

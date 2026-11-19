@@ -1,3 +1,4 @@
+import { ImageUploader } from "@/components/admin/ImageUploader";
 import { SubmitButton } from "@/components/admin/ui";
 import { cardClass, inputClass, labelClass } from "@/components/admin/styles";
 import { saveProductAction } from "@/lib/admin/actions/catalog";
@@ -93,7 +94,8 @@ export function ProductForm({
         <div>
           <label htmlFor="images" className={labelClass}>Imagens (links https, um por linha)</label>
           <textarea id="images" name="images" rows={3} defaultValue={product?.images.join("\n")} className={inputClass} />
-          <p className="mt-1 text-xs text-muted">Envio de arquivos depende de configurar o armazenamento de imagens (Cloudinary ou Vercel Blob).</p>
+          <ImageUploader targetId="images" multiple />
+          <p className="mt-1 text-xs text-muted">A primeira imagem da lista é a principal. Você também pode colar links https.</p>
         </div>
       </section>
 
