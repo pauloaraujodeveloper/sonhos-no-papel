@@ -74,8 +74,8 @@ export function Header({ categories = [] }: { categories?: NavCategory[] }) {
         </button>
 
         <Link href="/" className="flex shrink-0 items-center gap-2" aria-label="Sonhos no Papel — página inicial" onClick={() => setMenuOpen(false)}>
-          <Image src="/brand/simbolo.png" alt="" width={40} height={40} className="h-10 w-10 object-contain" priority />
-          <span className="hidden font-display text-lg font-semibold tracking-tight text-marinho sm:inline">Sonhos no Papel</span>
+          <Image src="/brand/simbolo.png" alt="" width={40} height={40} className="h-10 w-10 object-contain sm:hidden" priority />
+          <Image src="/brand/logo-horizontal.webp" alt="Sonhos no Papel" width={200} height={74} className="hidden h-11 w-auto sm:block" priority />
         </Link>
 
         <nav aria-label="Principal" className="hidden items-center gap-1 lg:flex">

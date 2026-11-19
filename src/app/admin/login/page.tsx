@@ -20,8 +20,8 @@ export default function LoginPage() {
     <main className="flex min-h-screen items-center justify-center bg-bebe-soft px-4">
       <div className="w-full max-w-sm space-y-6 rounded-lg border border-borda bg-white p-8 shadow-suave">
         <div className="flex flex-col items-center gap-2 text-center">
-          <Image src="/brand/simbolo.png" alt="" width={64} height={64} className="h-16 w-16 object-contain" priority />
-          <h1 className="font-display text-2xl font-semibold text-marinho">Painel Sonhos no Papel</h1>
+          <Image src="/brand/logo-completa.webp" alt="Sonhos no Papel" width={140} height={164} className="h-auto w-28" priority />
+          <h1 className="font-display text-xl font-semibold text-marinho">Painel administrativo</h1>
           <p className="text-sm text-muted">Acesso restrito à administração.</p>
         </div>
         <Suspense fallback={null}>

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { ProductImage } from "@/components/catalog/ProductCard";
 import { cartActions, useCartLines } from "@/lib/cart/store";
@@ -13,6 +14,7 @@ export function CartView() {
   if (priced.status === "empty") {
     return (
       <div className="rounded-md border border-dashed border-borda bg-white p-10 text-center">
+        <Image src="/brand/simbolo.png" alt="" width={96} height={77} className="mx-auto mb-3 h-auto w-24" />
         <p className="font-display text-xl font-semibold text-marinho">Seu carrinho está vazio</p>
         <p className="mt-1 text-sm text-muted">Que tal começar pelo catálogo?</p>
         <Link href="/produtos" className="mt-5 inline-block rounded-full bg-marinho px-6 py-3 text-sm font-bold text-papel hover:bg-marinho-texto">

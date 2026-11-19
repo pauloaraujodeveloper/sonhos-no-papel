@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Slogan } from "@/components/site/ThemeStyle";
@@ -9,7 +10,7 @@ export function Footer() {
     <footer className="mt-16 border-t border-borda bg-bebe-soft">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-8 text-sm text-muted sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div>
-          <p className="font-display text-base font-semibold text-marinho">{BRAND.name}</p>
+          <Image src="/brand/logo-horizontal.webp" alt={BRAND.name} width={200} height={74} className="mb-2 h-12 w-auto" />
           <p>
             <Suspense fallback={BRAND.slogan}>
               <Slogan />

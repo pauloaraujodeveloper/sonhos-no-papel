@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { cartActions, useCartLines } from "@/lib/cart/store";
@@ -33,6 +34,7 @@ export function CheckoutView() {
   if (created) {
     return (
       <div className="mx-auto max-w-xl space-y-4 rounded-lg border border-borda bg-white p-8 text-center shadow-suave" role="status">
+        <Image src="/brand/simbolo.png" alt="" width={96} height={77} className="mx-auto h-auto w-24" />
         <p className="text-sm font-bold uppercase tracking-widest text-muted">Pedido registrado</p>
         <h2 className="font-display text-3xl font-semibold text-marinho">{created.orderCode}</h2>
         <p className="text-muted">

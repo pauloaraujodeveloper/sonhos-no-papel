@@ -1,4 +1,3 @@
-import { RiArrowRightLine } from "@remixicon/react";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -167,22 +166,12 @@ export default function Home() {
         <Announcement />
       </Suspense>
 
-      <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-accent-600">{BRAND.name}</p>
-          <h1 className="font-display text-3xl font-semibold leading-tight tracking-tight text-marinho sm:text-5xl">
-            <Suspense fallback={BRAND.slogan}>
-              <Slogan />
-            </Suspense>
-          </h1>
-          <p className="mt-2 max-w-2xl text-muted">{BRAND.intro}</p>
-        </div>
-        <ButtonLink href="/produtos" trailingIcon={RiArrowRightLine}>
-          Ver catálogo completo
-        </ButtonLink>
-      </header>
-
-      <h2 className="mb-3 font-display text-2xl font-semibold tracking-tight text-marinho">Em destaque</h2>
+      <div className="mb-3 flex items-end justify-between gap-4">
+        <h1 className="font-display text-3xl font-semibold tracking-tight text-marinho sm:text-4xl">Em destaque</h1>
+        <Link href="/produtos" className="text-sm font-bold text-accent-600 hover:underline">
+          Ver catálogo completo →
+        </Link>
+      </div>
 
       <Suspense fallback={<ProductGridSkeleton count={5} />}>
         <Showcase />
@@ -223,8 +212,11 @@ export default function Home() {
         </RevealGroup>
       </section>
 
-      <section className="mt-12 flex flex-col items-center gap-4 rounded-lg bg-bebe-soft px-6 py-10 text-center">
-        <Image src="/brand/logo-completa.webp" alt="Sonhos no Papel" width={140} height={164} className="h-auto w-28" />
+      <section className="relative mt-12 flex flex-col items-center gap-4 overflow-hidden rounded-lg bg-bebe-soft px-6 py-10 text-center">
+        {/* Marca d'água discreta com o símbolo da marca. */}
+        <Image src="/brand/simbolo.png" alt="" width={320} height={256} aria-hidden="true" className="pointer-events-none absolute -left-10 -top-6 hidden h-auto w-56 -rotate-12 opacity-30 sm:block" />
+        <Image src="/brand/simbolo.png" alt="" width={320} height={256} aria-hidden="true" className="pointer-events-none absolute -bottom-8 -right-10 hidden h-auto w-64 rotate-12 opacity-30 sm:block" />
+        <Image src="/brand/logo-completa.webp" alt="Sonhos no Papel" width={140} height={164} className="relative h-auto w-28" />
         <p className="max-w-md font-display text-xl font-semibold text-marinho">
           <Suspense fallback={BRAND.slogan}>
             <Slogan />

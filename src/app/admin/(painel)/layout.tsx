@@ -30,8 +30,8 @@ async function Shell({ children }: { children: React.ReactNode }) {
       <header className="border-b border-borda bg-white">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
           <Link href="/admin" className="flex items-center gap-2">
-            <Image src="/brand/simbolo.png" alt="" width={36} height={36} className="h-9 w-9 object-contain" />
-            <span className="font-display font-semibold text-marinho">Painel</span>
+            <Image src="/brand/logo-horizontal.webp" alt="Sonhos no Papel" width={200} height={74} className="h-9 w-auto" />
+            <span className="rounded-full bg-lilas-soft px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide text-marinho">Painel</span>
           </Link>
           <nav aria-label="Painel" className="flex flex-1 flex-wrap gap-1">
             {NAV.map((item) => (
