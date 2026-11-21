@@ -19,7 +19,6 @@ import { Carousel, CarouselItem } from "@/components/base/carousel/carousel";
 import { ButtonLink } from "@/components/base/buttons/button";
 import { ProductCard, ProductGridSkeleton } from "@/components/catalog/ProductCard";
 import { RevealGroup } from "@/components/site/Reveal";
-import { TiltCard } from "@/components/site/TiltCard";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { SocialLinks } from "@/components/site/SocialLinks";
 import { Slogan } from "@/components/site/ThemeStyle";
@@ -51,60 +50,26 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** Destaca a última palavra do título com a cor de acento. */
-function AccentTitle({ text }: { text: string }) {
-  const words = text.trim().split(/\s+/);
-  if (words.length < 2) return <>{text}</>;
-  const last = words.pop();
-  return (
-    <>
-      {words.join(" ")} <span className="text-accent-600">{last}</span>
-    </>
-  );
-}
-
 /** Topo da home: primeiro banner ativo do painel (imagem, título, texto e link). Sem banner, não aparece. */
 async function Announcement() {
   const banner = await db.banner.findFirst({ where: { active: true }, orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }] });
   if (!banner) return null;
   const link = banner.linkUrl ?? "";
   const external = link.startsWith("https://");
-  const extraLink = link && link !== "/produtos";
 
   if (banner.imageUrl) {
-    return (
-      <section aria-label={banner.title} className="relative mb-12 overflow-hidden rounded-lg bg-bebe-soft sm:mb-16">
-        {/* Imagem vinda do armazenamento externo (Vercel Blob ou link https cadastrado no painel). */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={banner.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
-        {/* Véu: mais forte no celular (texto por cima da foto) e lateral no computador. */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-white/70 to-white/40 sm:bg-gradient-to-r sm:from-white/90 sm:via-white/55 sm:to-white/0" aria-hidden="true" />
-        <div className="relative flex min-h-80 items-center p-4 sm:min-h-[26rem] sm:p-10 lg:min-h-[30rem]">
-          <TiltCard max={3} className="max-w-xl rounded-lg">
-          <div className="rounded-lg bg-white/60 p-5 shadow-suave backdrop-blur-md sm:p-8">
-            <h2 className="font-display text-3xl font-semibold leading-tight tracking-tight text-marinho sm:text-5xl lg:text-6xl">
-              <AccentTitle text={banner.title} />
-            </h2>
-            {banner.subtitle && <p className="mt-3 text-base text-marinho-texto sm:text-lg">{banner.subtitle}</p>}
-            <div className="mt-5 flex flex-wrap items-center gap-3">
-              <ButtonLink href="/produtos" className="min-h-11">
-                Ver catálogo
-              </ButtonLink>
-              {extraLink &&
-                (external ? (
-                  <a href={link} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center text-sm font-bold text-accent-600 hover:underline">
-                    Saiba mais
-                  </a>
-                ) : (
-                  <Link href={link} className="inline-flex min-h-11 items-center text-sm font-bold text-accent-600 hover:underline">
-                    Ver agora
-                  </Link>
-                ))}
-            </div>
-          </div>
-          </TiltCard>
-        </div>
-      </section>
+    // Só a imagem (sem texto por cima, para ficar nítida no celular). Clicar leva ao catálogo ou ao link do banner.
+    const href = link || "/produtos";
+    const img = (
+      // Imagem vinda do armazenamento externo (Vercel Blob ou link https cadastrado no painel).
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={banner.imageUrl} alt={banner.title} className="block h-auto w-full" />
+    );
+    const cls = "mb-12 block overflow-hidden rounded-lg bg-bebe-soft sm:mb-16";
+    return external ? (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={cls}>{img}</a>
+    ) : (
+      <Link href={href} className={cls}>{img}</Link>
     );
   }
 
