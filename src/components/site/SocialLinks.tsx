@@ -2,8 +2,11 @@ import { buildWhatsAppUrl } from "@/lib/commerce/whatsapp";
 import { db } from "@/lib/db";
 import { instagramUrl } from "@/lib/social";
 
-const iconButton =
-  "flex h-11 w-11 items-center justify-center rounded-full border border-borda bg-white text-marinho shadow-suave transition duration-200 hover:-translate-y-0.5 hover:bg-lilas-soft focus-visible:-translate-y-0.5";
+// Cores oficiais de cada rede (identificação da marca de terceiros, não fazem parte da paleta editável).
+const base =
+  "flex h-11 w-11 items-center justify-center rounded-full text-white shadow-suave ring-1 ring-black/5 transition duration-300 ease-out hover:-translate-y-0.5 hover:shadow-lg focus-visible:-translate-y-0.5";
+const whatsappStyle = "bg-[#25d366] hover:bg-[#1ebe5b]";
+const instagramStyle = "bg-[linear-gradient(45deg,#feda75_0%,#fa7e1e_25%,#d62976_50%,#962fbf_75%,#4f5bd5_100%)] hover:brightness-110";
 
 function WhatsAppIcon() {
   return (
@@ -14,11 +17,34 @@ function WhatsAppIcon() {
 }
 
 function InstagramIcon() {
-  // Mesmo estilo preenchido do ícone de WhatsApp: contorno, lente e ponto vazados (regra evenodd).
+  // Preenchido, como o ícone de WhatsApp: contorno, lente e ponto vazados (regra evenodd).
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" fillRule="evenodd">
       <path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9a5.5 5.5 0 0 1-5.5 5.5h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2Z M7.5 3.8A3.7 3.7 0 0 0 3.8 7.5v9a3.7 3.7 0 0 0 3.7 3.7h9a3.7 3.7 0 0 0 3.7-3.7v-9a3.7 3.7 0 0 0-3.7-3.7h-9Z M12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Z M12 8.8a3.2 3.2 0 1 0 0 6.4 3.2 3.2 0 0 0 0-6.4Z M17.2 4.9a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2Z" />
     </svg>
+  );
+}
+
+/** Parte visual dos ícones (sem acesso ao banco): recebe os links já prontos. */
+export function SocialLinksView({ whatsapp, instagram, className = "" }: { whatsapp?: string | null; instagram?: string | null; className?: string }) {
+  if (!whatsapp && !instagram) return null;
+  return (
+    <ul className={`flex items-center gap-2.5 ${className}`} aria-label="Redes e contato">
+      {whatsapp && (
+        <li>
+          <a href={whatsapp} target="_blank" rel="noopener noreferrer" aria-label="Conversar no WhatsApp" title="WhatsApp" className={`${base} ${whatsappStyle}`}>
+            <WhatsAppIcon />
+          </a>
+        </li>
+      )}
+      {instagram && (
+        <li>
+          <a href={instagram} target="_blank" rel="noopener noreferrer" aria-label="Abrir o Instagram da loja" title="Instagram" className={`${base} ${instagramStyle}`}>
+            <InstagramIcon />
+          </a>
+        </li>
+      )}
+    </ul>
   );
 }
 
@@ -35,24 +61,5 @@ export async function SocialLinks({ className = "" }: { className?: string }) {
     ? buildWhatsAppUrl(settings.whatsappNumber, "Olá! Gostaria de saber mais sobre a Sonhos no Papel.")
     : null;
   const instagram = instagramUrl((settings?.socialLinks as { instagram?: string } | null)?.instagram);
-  if (!whatsapp && !instagram) return null;
-
-  return (
-    <ul className={`flex items-center gap-2 ${className}`} aria-label="Redes e contato">
-      {whatsapp && (
-        <li>
-          <a href={whatsapp} target="_blank" rel="noopener noreferrer" aria-label="Conversar no WhatsApp" title="WhatsApp" className={iconButton}>
-            <WhatsAppIcon />
-          </a>
-        </li>
-      )}
-      {instagram && (
-        <li>
-          <a href={instagram} target="_blank" rel="noopener noreferrer" aria-label="Abrir o Instagram da loja" title="Instagram" className={iconButton}>
-            <InstagramIcon />
-          </a>
-        </li>
-      )}
-    </ul>
-  );
+  return <SocialLinksView whatsapp={whatsapp} instagram={instagram} className={className} />;
 }
