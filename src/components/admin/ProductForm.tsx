@@ -1,4 +1,4 @@
-import { ImageUploader } from "@/components/admin/ImageUploader";
+import { ProductImages } from "@/components/admin/ProductImages";
 import { SubmitButton } from "@/components/admin/ui";
 import { cardClass, inputClass, labelClass } from "@/components/admin/styles";
 import { saveProductAction } from "@/lib/admin/actions/catalog";
@@ -92,10 +92,8 @@ export function ProductForm({
           <p className="mt-1 text-xs text-muted">Uma por linha: Nome; acréscimo de preço em R$; estoque (o estoque só vale ao criar a variação).</p>
         </div>
         <div>
-          <label htmlFor="images" className={labelClass}>Imagens (links https, um por linha)</label>
-          <textarea id="images" name="images" rows={3} defaultValue={product?.images.join("\n")} className={inputClass} />
-          <ImageUploader targetId="images" multiple />
-          <p className="mt-1 text-xs text-muted">A primeira imagem da lista é a principal. Você também pode colar links https.</p>
+          <p className={labelClass}>Fotos do produto</p>
+          <ProductImages initial={product?.images ?? []} />
         </div>
       </section>
 
