@@ -19,6 +19,7 @@ import { Carousel, CarouselItem } from "@/components/base/carousel/carousel";
 import { ButtonLink } from "@/components/base/buttons/button";
 import { ProductCard, ProductGridSkeleton } from "@/components/catalog/ProductCard";
 import { RevealGroup } from "@/components/site/Reveal";
+import { TiltCard } from "@/components/site/TiltCard";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { SocialLinks } from "@/components/site/SocialLinks";
 import { Slogan } from "@/components/site/ThemeStyle";
@@ -79,7 +80,8 @@ async function Announcement() {
         {/* Véu: mais forte no celular (texto por cima da foto) e lateral no computador. */}
         <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-white/70 to-white/40 sm:bg-gradient-to-r sm:from-white/90 sm:via-white/55 sm:to-white/0" aria-hidden="true" />
         <div className="relative flex min-h-80 items-center p-4 sm:min-h-[26rem] sm:p-10 lg:min-h-[30rem]">
-          <div className="max-w-xl rounded-lg bg-white/60 p-5 shadow-suave backdrop-blur-md sm:p-8">
+          <TiltCard max={3} className="max-w-xl rounded-lg">
+          <div className="rounded-lg bg-white/60 p-5 shadow-suave backdrop-blur-md sm:p-8">
             <h2 className="font-display text-3xl font-semibold leading-tight tracking-tight text-marinho sm:text-5xl lg:text-6xl">
               <AccentTitle text={banner.title} />
             </h2>
@@ -100,6 +102,7 @@ async function Announcement() {
                 ))}
             </div>
           </div>
+          </TiltCard>
         </div>
       </section>
     );
@@ -143,12 +146,16 @@ async function Showcase() {
   // Mantém a grade completa: com quantidade ímpar, o último card sai (sem buracos na vitrine).
   const rest = others.length % 2 === 1 ? others.slice(0, -1) : others;
   return (
-    <RevealGroup className={`grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 ${rest.length >= 4 ? "lg:grid-rows-2" : ""}`}>
+    <RevealGroup
+      directions={["left", "up", "right", "down", "flip"]}
+      className={`grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 ${rest.length >= 4 ? "lg:grid-rows-2" : ""}`}
+    >
       <div className={`col-span-2 ${rest.length >= 4 ? "lg:row-span-2" : ""}`}>
         <ProductCard product={lead} featured />
       </div>
-      {rest.map((p) => (
-        <div key={p.id}>
+      {rest.map((p, i) => (
+        // Zigue-zague no computador: os cartões pares descem um pouco, quebrando a linha reta da grade.
+        <div key={p.id} className={i % 2 === 1 ? "lg:mt-8" : ""}>
           <ProductCard product={p} />
         </div>
       ))}
@@ -178,7 +185,7 @@ async function Categories() {
   // Com 5 categorias, a primeira vira um cartão grande (grade "bento") no computador.
   const bento = categories.length === 5;
   return (
-    <RevealGroup className={`grid grid-cols-2 gap-3 sm:grid-cols-3 ${bento ? "lg:grid-cols-4" : "lg:grid-cols-5"}`}>
+    <RevealGroup directions={["flip", "down", "left", "right", "up"]} className={`grid grid-cols-2 gap-3 sm:grid-cols-3 ${bento ? "lg:grid-cols-4" : "lg:grid-cols-5"}`}>
       {categories.map((c, i) => {
         const IconComponent = categoryIcon(c.slug, c.name);
         const isLast = i === categories.length - 1;
@@ -258,7 +265,7 @@ const BENEFITS: { title: string; text: string; icon: Icon }[] = [
 
 function Benefits() {
   return (
-    <RevealGroup className="mt-12 grid gap-3 sm:mt-16 sm:grid-cols-3">
+    <RevealGroup directions={["left", "up", "right"]} className="mt-12 grid gap-3 sm:mt-16 sm:grid-cols-3">
       {BENEFITS.map((b) => (
         <div key={b.title} className="flex items-start gap-3 rounded-md border border-borda bg-white/70 p-4 backdrop-blur-sm">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-lilas-soft text-marinho">
@@ -325,7 +332,7 @@ export default function Home() {
         <div className="relative">
           {/* Linha que conecta os passos (só no computador). */}
           <div className="absolute left-[16%] right-[16%] top-14 hidden h-px bg-gradient-to-r from-lilas via-rosa to-bebe sm:block" aria-hidden="true" />
-          <RevealGroup className="relative grid gap-3 sm:grid-cols-3 sm:gap-6">
+          <RevealGroup directions={["left", "up", "right"]} className="relative grid gap-3 sm:grid-cols-3 sm:gap-6">
             {STEPS.map((s) => (
               <div key={s.n} className="rounded-md border border-borda bg-white p-5 shadow-suave transition duration-300 ease-out hover:-translate-y-1 sm:text-center">
                 <div className="flex items-center gap-3 sm:flex-col sm:gap-2">

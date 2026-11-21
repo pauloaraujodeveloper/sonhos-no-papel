@@ -2,6 +2,7 @@ import { RiArrowRightLine } from "@remixicon/react";
 import Image from "next/image";
 import Link from "next/link";
 import { SpotlightCard } from "@/components/catalog/SpotlightCard";
+import { TiltCard } from "@/components/site/TiltCard";
 import { formatBRL } from "@/lib/commerce/pricing";
 import type { ProductSummary } from "@/lib/catalog/queries";
 
@@ -58,6 +59,7 @@ export function StockBadge({ status, promo, isNew }: { status: ProductSummary["s
 export function ProductCard({ product, featured = false }: { product: ProductSummary; featured?: boolean }) {
   const out = product.stockStatus === "OUT_OF_STOCK";
   return (
+    <TiltCard className="h-full">
     <SpotlightCard className="group flex h-full flex-col overflow-hidden rounded-md border border-borda bg-white shadow-suave transition duration-300 ease-out hover:-translate-y-1 hover:shadow-lg">
       <Link href={`/produto/${product.slug}`} className="flex flex-1 flex-col">
         <div className={`relative overflow-hidden ${featured ? "min-h-64 flex-1" : "aspect-square"}`}>
@@ -87,6 +89,7 @@ export function ProductCard({ product, featured = false }: { product: ProductSum
         </div>
       </Link>
     </SpotlightCard>
+    </TiltCard>
   );
 }
 

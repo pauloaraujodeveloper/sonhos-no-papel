@@ -99,10 +99,47 @@
 /* Garantia: se o JavaScript demorar, o conteúdo aparece sozinho depois de 1,4 s. */
 .reveal > * {
   opacity: 0;
+}
+/* Só vale enquanto o JavaScript não assumiu o grupo (classe reveal-ready). */
+.reveal:not(.reveal-ready) > * {
   animation: reveal-fallback 0.01s 1.4s forwards;
 }
 @media (scripting: none), (prefers-reduced-motion: reduce) {
   .reveal > * {
     opacity: 1;
+  }
+}
+
+/* Perspectiva para as revela��es em 3D (os filhos giram em profundidade). */
+.reveal {
+  perspective: 1100px;
+}
+
+/* TiltCard: inclina��o 3D com brilho que segue o ponteiro (s� com mouse e sem "reduzir movimento"). */
+.tilt {
+  position: relative;
+  border-radius: var(--radius-md);
+  transform-style: preserve-3d;
+  transition: transform 0.25s ease-out;
+  will-change: transform;
+}
+.tilt-glare {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgb(255 255 255 / 0.5), transparent 55%);
+  transition: opacity 0.25s ease-out;
+}
+.tilt:hover .tilt-glare {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tilt {
+    transition: none;
+  }
+  .tilt-glare {
+    display: none;
   }
 }
