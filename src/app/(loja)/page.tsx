@@ -3,6 +3,7 @@ import {
   RiBook2Line,
   RiBrushLine,
   RiCalendar2Line,
+  RiCheckboxCircleLine,
   RiPencilLine,
   RiPenNibLine,
   RiQrCodeLine,
@@ -18,6 +19,7 @@ import { Carousel, CarouselItem } from "@/components/base/carousel/carousel";
 import { ButtonLink } from "@/components/base/buttons/button";
 import { ProductCard, ProductGridSkeleton } from "@/components/catalog/ProductCard";
 import { RevealGroup } from "@/components/site/Reveal";
+import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { SocialLinks } from "@/components/site/SocialLinks";
 import { Slogan } from "@/components/site/ThemeStyle";
 import { listCategories, listProducts, type ProductListParams } from "@/lib/catalog/queries";
@@ -35,6 +37,16 @@ function MoreLink({ href, children }: { href: string; children: React.ReactNode 
       <span>{children}</span>
       <RiArrowRightLine aria-hidden="true" className="h-4 w-4 transition-transform duration-300 ease-out group-hover:translate-x-0.5" />
     </Link>
+  );
+}
+
+/** Rótulo pequeno em maiúsculas acima dos títulos de seção. */
+function Eyebrow({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="mb-2 flex items-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.2em] text-accent-600">
+      <span aria-hidden="true" className="h-px w-6 bg-current" />
+      {children}
+    </p>
   );
 }
 
@@ -163,15 +175,19 @@ const CATEGORY_TONES = ["bg-lilas-soft", "bg-rosa-soft", "bg-bebe-soft", "bg-sol
 async function Categories() {
   const categories = await listCategories();
   if (categories.length === 0) return null;
+  // Com 5 categorias, a primeira vira um cartão grande (grade "bento") no computador.
+  const bento = categories.length === 5;
   return (
-    <RevealGroup className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+    <RevealGroup className={`grid grid-cols-2 gap-3 sm:grid-cols-3 ${bento ? "lg:grid-cols-4" : "lg:grid-cols-5"}`}>
       {categories.map((c, i) => {
         const IconComponent = categoryIcon(c.slug, c.name);
+        const isLast = i === categories.length - 1;
+        const span = bento && i === 0 ? "col-span-2 lg:row-span-2" : !bento && isLast && categories.length % 2 === 1 ? "col-span-2 sm:col-span-1" : "";
         return (
           <Link
             key={c.id}
             href={`/categoria/${c.slug}`}
-            className={`group flex min-h-36 flex-col justify-between gap-6 rounded-md border border-borda p-4 shadow-suave transition duration-300 ease-out hover:-translate-y-1 hover:shadow-lg ${CATEGORY_TONES[i % CATEGORY_TONES.length]} ${i === categories.length - 1 && categories.length % 2 === 1 ? "col-span-2 sm:col-span-1" : ""}`}
+            className={`group flex min-h-36 flex-col justify-between gap-6 rounded-md border border-borda p-4 shadow-suave transition duration-300 ease-out hover:-translate-y-1 hover:shadow-lg ${CATEGORY_TONES[i % CATEGORY_TONES.length]} ${span}`}
           >
             <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white/80 text-marinho transition-transform duration-300 ease-out group-hover:scale-110">
               <IconComponent aria-hidden="true" className="h-6 w-6" />
@@ -188,13 +204,16 @@ async function Categories() {
 }
 
 /** Faixa deslizante (carrossel) de produtos. Some quando não há produtos. */
-async function Strip({ title, params, href }: { title: string; params: ProductListParams; href: string }) {
+async function Strip({ title, eyebrow, params, href }: { title: string; eyebrow: string; params: ProductListParams; href: string }) {
   const { items } = await listProducts({ ...params, limit: 10 });
   if (items.length === 0) return null;
   return (
     <section className={SECTION} aria-label={title}>
       <div className="mb-4 flex items-end justify-between gap-4">
-        <h2 className="font-display text-2xl font-semibold tracking-tight text-marinho">{title}</h2>
+        <div>
+          <Eyebrow>{eyebrow}</Eyebrow>
+          <h2 className="font-display text-2xl font-semibold tracking-tight text-marinho">{title}</h2>
+        </div>
         <MoreLink href={href}>Ver todos</MoreLink>
       </div>
       <Carousel aria-label={title} showDots={false} gap={12}>
@@ -230,15 +249,46 @@ const STEPS: { n: string; title: string; text: string; icon: Icon }[] = [
   { n: "3", title: "Receba o Pix", text: "Pelo WhatsApp você recebe a chave ou o QR Code Pix para pagar.", icon: RiQrCodeLine },
 ];
 
+/** Três garantias curtas logo após a vitrine: atendimento, Pix e estoque. */
+const BENEFITS: { title: string; text: string; icon: Icon }[] = [
+  { title: "Atendimento direto", text: "Tire dúvidas e feche seu pedido pelo WhatsApp.", icon: RiWhatsappLine },
+  { title: "Pagamento por Pix", text: "Você recebe a chave ou o QR Code Pix na conversa.", icon: RiQrCodeLine },
+  { title: "Estoque atualizado", text: "Cada produto mostra a disponibilidade do momento.", icon: RiCheckboxCircleLine },
+];
+
+function Benefits() {
+  return (
+    <RevealGroup className="mt-12 grid gap-3 sm:mt-16 sm:grid-cols-3">
+      {BENEFITS.map((b) => (
+        <div key={b.title} className="flex items-start gap-3 rounded-md border border-borda bg-white/70 p-4 backdrop-blur-sm">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-lilas-soft text-marinho">
+            <b.icon aria-hidden="true" className="h-5 w-5" />
+          </span>
+          <div>
+            <p className="font-display font-semibold text-marinho">{b.title}</p>
+            <p className="text-sm text-muted">{b.text}</p>
+          </div>
+        </div>
+      ))}
+    </RevealGroup>
+  );
+}
+
 export default function Home() {
   return (
     <main className="mx-auto w-full max-w-6xl px-4 pb-8 pt-6 sm:px-6">
+      <ScrollProgress />
+      <h1 className="sr-only">Sonhos no Papel, papelaria afetiva</h1>
+
       <Suspense fallback={null}>
         <Announcement />
       </Suspense>
 
       <div className="mb-4 flex items-end justify-between gap-4">
-        <h1 className="font-display text-3xl font-semibold tracking-tight text-marinho sm:text-4xl">Em destaque</h1>
+        <div>
+          <Eyebrow>Vitrine</Eyebrow>
+          <h2 className="font-display text-3xl font-semibold tracking-tight text-marinho sm:text-4xl">Em destaque</h2>
+        </div>
         <MoreLink href="/produtos">
           Ver catálogo<span className="hidden sm:inline"> completo</span>
         </MoreLink>
@@ -248,7 +298,10 @@ export default function Home() {
         <Showcase />
       </Suspense>
 
+      <Benefits />
+
       <section className={SECTION} aria-labelledby="categorias">
+        <Eyebrow>Navegue</Eyebrow>
         <h2 id="categorias" className="mb-4 font-display text-2xl font-semibold tracking-tight text-marinho">
           Explore por categoria
         </h2>
@@ -258,13 +311,14 @@ export default function Home() {
       </section>
 
       <Suspense fallback={null}>
-        <Strip title="Novidades" params={{ onlyNew: true }} href="/produtos?ordem=novidades" />
+        <Strip title="Novidades" eyebrow="Chegou agora" params={{ onlyNew: true }} href="/produtos?ordem=novidades" />
       </Suspense>
       <Suspense fallback={null}>
-        <Strip title="Ofertas especiais" params={{ onlyPromo: true }} href="/produtos" />
+        <Strip title="Ofertas especiais" eyebrow="Oportunidades" params={{ onlyPromo: true }} href="/produtos" />
       </Suspense>
 
       <section className={SECTION} aria-labelledby="como-comprar">
+        <Eyebrow>Passo a passo</Eyebrow>
         <h2 id="como-comprar" className="mb-6 font-display text-2xl font-semibold tracking-tight text-marinho">
           Como comprar
         </h2>
@@ -290,13 +344,18 @@ export default function Home() {
         </div>
       </section>
 
-      <section className={`relative overflow-hidden rounded-lg bg-gradient-to-br from-bebe-soft via-lilas-soft to-rosa-soft ${SECTION}`}>
+      {/* Faixa final em modo noite: fundo marinho com contraste alto e acentos lilás e rosa. */}
+      <section className={`relative overflow-hidden rounded-lg bg-gradient-to-br from-marinho via-accent-800 to-marinho text-papel ${SECTION}`}>
+        <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-rosa/25 blur-3xl" aria-hidden="true" />
+        <div className="pointer-events-none absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-lilas/25 blur-3xl" aria-hidden="true" />
         {/* Marca d'água discreta com o símbolo da marca. */}
-        <Image src="/brand/simbolo.png" alt="" width={320} height={256} aria-hidden="true" className="pointer-events-none absolute -bottom-10 -right-12 hidden h-auto w-72 rotate-12 opacity-25 lg:block" />
+        <Image src="/brand/simbolo.png" alt="" width={320} height={256} aria-hidden="true" className="pointer-events-none absolute -bottom-10 -right-12 hidden h-auto w-72 rotate-12 opacity-15 lg:block" />
         <div className="relative grid items-center gap-8 px-6 py-10 text-center sm:px-10 sm:py-14 md:grid-cols-2 md:text-left">
           <div className="flex flex-col items-center gap-4 md:items-start">
-            <Image src="/brand/logo-completa.webp" alt="Sonhos no Papel" width={140} height={164} className="h-auto w-28" />
-            <p className="max-w-md font-display text-2xl font-semibold text-marinho">
+            <div className="rounded-lg bg-papel/95 p-3 shadow-lg">
+              <Image src="/brand/logo-completa.webp" alt="Sonhos no Papel" width={140} height={164} className="h-auto w-24" />
+            </div>
+            <p className="max-w-md font-display text-2xl font-semibold text-papel">
               <Suspense fallback={BRAND.slogan}>
                 <Slogan />
               </Suspense>
@@ -304,9 +363,9 @@ export default function Home() {
             </p>
           </div>
           <div className="flex flex-col items-center gap-5 md:items-start">
-            <p className="max-w-md text-muted">Ficou com dúvida sobre algum produto? Chame a gente no WhatsApp.</p>
+            <p className="max-w-md text-papel/80">Ficou com dúvida sobre algum produto? Chame a gente no WhatsApp.</p>
             <div className="flex flex-wrap justify-center gap-3 md:justify-start">
-              <ButtonLink href="/produtos" className="min-h-11">
+              <ButtonLink href="/produtos" variant="secondary" className="min-h-11">
                 Ver catálogo
               </ButtonLink>
               <Suspense fallback={null}>

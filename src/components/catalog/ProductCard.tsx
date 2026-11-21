@@ -1,6 +1,7 @@
 import { RiArrowRightLine } from "@remixicon/react";
 import Image from "next/image";
 import Link from "next/link";
+import { SpotlightCard } from "@/components/catalog/SpotlightCard";
 import { formatBRL } from "@/lib/commerce/pricing";
 import type { ProductSummary } from "@/lib/catalog/queries";
 
@@ -17,14 +18,39 @@ export function ProductImage({ url, alt, className = "" }: { url: string | null;
   return <img src={url} alt={alt} loading="lazy" decoding="async" className={`object-cover ${className}`} />;
 }
 
+/** Ponto pulsante do selo (pulsa só se o usuário aceitar movimento). */
+function StatusDot() {
+  return <span aria-hidden="true" className="size-1.5 rounded-full bg-current motion-safe:animate-pulse" />;
+}
+
 export function StockBadge({ status, promo, isNew }: { status: ProductSummary["stockStatus"]; promo?: boolean; isNew?: boolean }) {
-  const base = "rounded-full px-2.5 py-0.5 text-xs font-bold";
+  const base = "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold shadow-suave";
   return (
     <div className="flex flex-wrap gap-1.5">
-      {status === "OUT_OF_STOCK" && <span className={`${base} bg-marinho text-papel`}>Esgotado</span>}
-      {status === "LOW_STOCK" && <span className={`${base} bg-sol text-marinho`}>Últimas unidades</span>}
-      {promo && status !== "OUT_OF_STOCK" && <span className={`${base} bg-rosa-soft text-marinho`}>Promoção</span>}
-      {isNew && status !== "OUT_OF_STOCK" && <span className={`${base} bg-lilas-soft text-marinho`}>Novo</span>}
+      {status === "OUT_OF_STOCK" && (
+        <span className={`${base} bg-marinho text-papel`}>
+          <StatusDot />
+          Esgotado
+        </span>
+      )}
+      {status === "LOW_STOCK" && (
+        <span className={`${base} bg-sol text-marinho`}>
+          <StatusDot />
+          Últimas unidades
+        </span>
+      )}
+      {promo && status !== "OUT_OF_STOCK" && (
+        <span className={`${base} bg-rosa-soft text-marinho`}>
+          <StatusDot />
+          Promoção
+        </span>
+      )}
+      {isNew && status !== "OUT_OF_STOCK" && (
+        <span className={`${base} bg-lilas-soft text-marinho`}>
+          <StatusDot />
+          Novo
+        </span>
+      )}
     </div>
   );
 }
@@ -32,7 +58,7 @@ export function StockBadge({ status, promo, isNew }: { status: ProductSummary["s
 export function ProductCard({ product, featured = false }: { product: ProductSummary; featured?: boolean }) {
   const out = product.stockStatus === "OUT_OF_STOCK";
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-md border border-borda bg-white shadow-suave transition duration-300 ease-out hover:-translate-y-1 hover:shadow-lg">
+    <SpotlightCard className="group flex h-full flex-col overflow-hidden rounded-md border border-borda bg-white shadow-suave transition duration-300 ease-out hover:-translate-y-1 hover:shadow-lg">
       <Link href={`/produto/${product.slug}`} className="flex flex-1 flex-col">
         <div className={`relative overflow-hidden ${featured ? "min-h-64 flex-1" : "aspect-square"}`}>
           <ProductImage
@@ -60,7 +86,7 @@ export function ProductCard({ product, featured = false }: { product: ProductSum
           </span>
         </div>
       </Link>
-    </article>
+    </SpotlightCard>
   );
 }
 

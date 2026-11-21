@@ -68,7 +68,29 @@
   --color-accent-900: #2e2459;
   --color-accent-950: #1d1740;
 }
-/* Entrada animada (RevealGroup): filhos come�am invis�veis e o animejs os revela ao aparecerem na tela. */
+/* Brilho que segue o cursor nos cards (SpotlightCard). Só em dispositivos com mouse. */
+.spotlight {
+  position: relative;
+  isolation: isolate;
+}
+.spotlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), rgb(255 255 255 / 0.35), transparent 70%);
+  opacity: 0;
+  transition: opacity 300ms ease-out;
+}
+@media (hover: hover) {
+  .spotlight:hover::after {
+    opacity: 1;
+  }
+}
+
+/* Entrada animada (RevealGroup): filhos começam invisíveis e o animejs os revela ao aparecerem na tela. */
 @keyframes reveal-fallback {
   to {
     opacity: 1;

@@ -51,6 +51,22 @@ export function Header({ categories = [] }: { categories?: NavCategory[] }) {
     previous.current = count;
   }, [count]);
 
+  // Atalho "/" foca a busca (fora de campos de texto), como em painéis e sites técnicos.
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== "/" || e.ctrlKey || e.metaKey || e.altKey) return;
+      const target = e.target as HTMLElement | null;
+      if (target?.closest("input, textarea, select, [contenteditable='true']")) return;
+      const input = document.getElementById("busca-topo") as HTMLInputElement | null;
+      if (!input) return;
+      e.preventDefault();
+      input.focus();
+      input.select();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   const fallback = [
     { href: "/", label: "Início" },
     { href: "/produtos", label: "Catálogo" },
@@ -100,9 +116,13 @@ export function Header({ categories = [] }: { categories?: NavCategory[] }) {
               id="busca-topo"
               name="q"
               type="search"
+              aria-keyshortcuts="/"
               placeholder="Buscar"
-              className="h-11 w-full rounded-full border border-borda bg-white pl-10 pr-4 text-sm text-marinho shadow-suave transition-colors duration-300 ease-out placeholder:text-muted focus:border-rosa focus:outline-none"
+              className="h-11 w-full rounded-full border border-borda bg-white pl-10 pr-4 text-sm text-marinho shadow-suave transition-colors duration-300 ease-out placeholder:text-muted focus:border-rosa focus:outline-none lg:pr-10"
             />
+            <kbd aria-hidden="true" className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded-md border border-borda bg-papel px-1.5 text-xs font-semibold text-muted lg:block">
+              /
+            </kbd>
           </div>
         </form>
 
